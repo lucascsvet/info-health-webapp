@@ -1,0 +1,11 @@
+services:
+  webapp:
+    image: info-health-webapp:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        VITE_API_URL: http://localhost:8000
+    container_name: info-health-webapp
+    ports:
+      - "3000:80"
