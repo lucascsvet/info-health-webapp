@@ -63,7 +63,7 @@
 
         <p class="text-center text-muted small mt-4 mb-0">
           Não tem uma conta?
-          <a href="#" class="text-primary text-decoration-underline">Cadastre-se</a>
+          <router-link to="/registro" class="text-primary text-decoration-underline">Cadastre-se</router-link>
         </p>
       </div>
     </div>
