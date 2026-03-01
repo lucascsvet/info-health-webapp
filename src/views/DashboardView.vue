@@ -6,7 +6,7 @@
         <span>Info Health</span>
       </router-link>
       <div class="navbar-nav ms-auto">
-        <button type="button" class="btn btn-outline-light btn-sm" @click="logout">Sair</button>
+        <button type="button" class="btn btn-outline-light btn-sm" @click="logout" title="Sair"><i class="bi bi-box-arrow-right"></i></button>
       </div>
     </div>
   </nav>
