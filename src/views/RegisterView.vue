@@ -1,16 +1,16 @@
 <template>
-  <AppNavbar />
+  <AppNavbar :auth="isEdit" />
 
   <div class="container py-5">
     <div class="text-center mb-4">
       <img src="/img/info-health.png" alt="Info Health" height="80" width="80" class="mb-3">
-      <h4 class="fw-bold text-dark mb-1">Crie sua conta de saúde</h4>
+      <h4 class="fw-bold text-dark mb-1">{{ title }}</h4>
       <p class="text-muted">Fique mais seguro!</p>
     </div>
 
     <div v-if="error" class="alert alert-danger">{{ error }}</div>
 
-    <form @submit.prevent="submit" class="mx-auto" style="max-width: 600px;">
+    <form v-if="form" @submit.prevent="submit" class="mx-auto" style="max-width: 600px;">
       <h6 class="text-muted mb-3">Informações pessoais</h6>
       <div class="row g-3 mb-4">
         <div class="col-md-6">
@@ -23,7 +23,7 @@
         </div>
         <div class="col-md-6">
           <label class="form-label">CPF *</label>
-          <MaskInput v-model="form.cpf" mask="###.###.###-##" class="form-control" placeholder="Digite seu CPF" required />
+          <MaskInput v-model="form.cpf" :value="form.cpf" mask="###.###.###-##" class="form-control" placeholder="Digite seu CPF" required />
         </div>
         <div class="col-md-6">
           <label class="form-label">Email *</label>
@@ -31,7 +31,7 @@
         </div>
         <div class="col-md-6">
           <label class="form-label">Telefone *</label>
-          <MaskInput v-model="form.phone" mask="(##) #####-####" class="form-control" placeholder="Digite seu telefone" required />
+          <MaskInput v-model="form.phone" :value="form.phone" mask="(##) #####-####" class="form-control" placeholder="Digite seu telefone" required />
         </div>
         <div class="col-md-6">
           <label class="form-label">Gênero *</label>
@@ -59,7 +59,7 @@
         </div>
         <div class="col-md-6">
           <label class="form-label">Telefone do Contato de Emergência *</label>
-          <MaskInput v-model="form.emergency_contact_phone" mask="(##) #####-####" class="form-control" placeholder="Digite o telefone do seu contato de emergência" required />
+          <MaskInput v-model="form.emergency_contact_phone" :value="form.emergency_contact_phone" mask="(##) #####-####" class="form-control" placeholder="Digite o telefone do seu contato de emergência" required />
         </div>
       </div>
 
@@ -85,28 +85,30 @@
 
       <h6 class="text-muted mb-3">Segurança</h6>
       <div class="mb-4">
-        <div class="mb-3">
-          <label class="form-label">Senha *</label>
-          <div class="input-group">
-            <input v-model="form.password" :type="showPassword ? 'text' : 'password'" class="form-control" placeholder="Digite sua senha. Mínimo 6 caracteres" required minlength="6">
-            <button type="button" class="btn btn-outline-secondary" @click="showPassword = !showPassword">
-              <i :class="showPassword ? 'bi bi-eye-slash' : 'bi bi-eye'"></i>
-            </button>
+        <template v-if="!isEdit">
+          <div class="mb-3">
+            <label class="form-label">Senha *</label>
+            <div class="input-group">
+              <input v-model="form.password" :type="showPassword ? 'text' : 'password'" class="form-control" placeholder="Digite sua senha. Mínimo 6 caracteres" required minlength="6">
+              <button type="button" class="btn btn-outline-secondary" @click="showPassword = !showPassword">
+                <i :class="showPassword ? 'bi bi-eye-slash' : 'bi bi-eye'"></i>
+              </button>
+            </div>
           </div>
-        </div>
-        <div class="mb-3">
-          <label class="form-label">Confirmação de Senha *</label>
-          <div class="input-group">
-            <input v-model="form.password_confirmation" :type="showPasswordConfirm ? 'text' : 'password'" class="form-control" placeholder="Digite sua senha. Mínimo 6 caracteres" required minlength="6">
-            <button type="button" class="btn btn-outline-secondary" @click="showPasswordConfirm = !showPasswordConfirm">
-              <i :class="showPasswordConfirm ? 'bi bi-eye-slash' : 'bi bi-eye'"></i>
-            </button>
+          <div class="mb-3">
+            <label class="form-label">Confirmação de Senha *</label>
+            <div class="input-group">
+              <input v-model="form.password_confirmation" :type="showPasswordConfirm ? 'text' : 'password'" class="form-control" placeholder="Digite sua senha. Mínimo 6 caracteres" required minlength="6">
+              <button type="button" class="btn btn-outline-secondary" @click="showPasswordConfirm = !showPasswordConfirm">
+                <i :class="showPasswordConfirm ? 'bi bi-eye-slash' : 'bi bi-eye'"></i>
+              </button>
+            </div>
           </div>
-        </div>
+        </template>
         <div class="mb-3">
           <label class="form-label">Senha de Acesso Público *</label>
           <div class="input-group">
-            <input v-model="form.public_password" :type="showPublicPassword ? 'text' : 'password'" class="form-control" placeholder="Digite sua senha. Mínimo 4 caracteres" required minlength="4">
+            <input v-model="form.public_password" :type="showPublicPassword ? 'text' : 'password'" class="form-control" :placeholder="isEdit ? 'Mínimo 4 caracteres' : 'Digite sua senha. Mínimo 4 caracteres'" required minlength="4">
             <button type="button" class="btn btn-outline-secondary" @click="showPublicPassword = !showPublicPassword">
               <i :class="showPublicPassword ? 'bi bi-eye-slash' : 'bi bi-eye'"></i>
             </button>
@@ -116,7 +118,7 @@
 
       <div class="d-flex flex-column gap-2">
         <button type="submit" class="btn btn-primary py-2" :disabled="loading">{{ submitButtonText }}</button>
-        <router-link to="/login" class="btn btn-secondary py-2">Voltar</router-link>
+        <router-link :to="isEdit ? '/' : '/login'" class="btn btn-secondary py-2">Voltar</router-link>
       </div>
     </form>
   </div>
@@ -126,28 +128,30 @@
 import AppNavbar from '../components/AppNavbar.vue'
 import api from '../api/client.js'
 
+const emptyForm = () => ({
+  first_name: '',
+  last_name: '',
+  cpf: '',
+  email: '',
+  phone: '',
+  gender: 1,
+  blood_type: '',
+  emergency_contact_name: '',
+  emergency_contact_phone: '',
+  allergies: '',
+  medications: '',
+  diseases: '',
+  surgeries: '',
+  password: '',
+  password_confirmation: '',
+  public_password: '',
+})
+
 export default {
   components: { AppNavbar },
   data() {
     return {
-      form: {
-        first_name: '',
-        last_name: '',
-        cpf: '',
-        email: '',
-        phone: '',
-        gender: 1,
-        blood_type: '',
-        emergency_contact_name: '',
-        emergency_contact_phone: '',
-        allergies: '',
-        medications: '',
-        diseases: '',
-        surgeries: '',
-        password: '',
-        password_confirmation: '',
-        public_password: '',
-      },
+      form: null,
       genders: [],
       bloodTypes: [],
       showPassword: false,
@@ -158,12 +162,24 @@ export default {
     }
   },
   computed: {
+    isEdit() {
+      return this.$route.name === 'editar-dados'
+    },
+    title() {
+      return this.isEdit ? 'Editar dados' : 'Crie sua conta de saúde'
+    },
     submitButtonText() {
-      return this.loading ? 'Cadastrando...' : 'Cadastrar'
+      if (this.loading) return this.isEdit ? 'Atualizando...' : 'Cadastrando...'
+      return this.isEdit ? 'Atualizar' : 'Cadastrar'
     },
   },
   mounted() {
     this.fetchOptions()
+    if (this.isEdit) {
+      this.fetchUser()
+    } else {
+      this.form = emptyForm()
+    }
   },
   methods: {
     async fetchOptions() {
@@ -178,26 +194,61 @@ export default {
         this.error = 'Erro ao carregar opções. Tente novamente.'
       }
     },
+    async fetchUser() {
+      try {
+        const user = await api.get('/api/user')
+        const cd = user.clinical_data
+        this.form = {
+          ...emptyForm(),
+          first_name: user.first_name || '',
+          last_name: user.last_name || '',
+          cpf: user.cpf || '',
+          email: user.email || '',
+          phone: user.phone || '',
+          gender: cd?.gender ?? 1,
+          blood_type: cd?.blood_type.id ?? '',
+          emergency_contact_name: cd?.emergency_contact_name || '',
+          emergency_contact_phone: cd?.emergency_contact_phone || '',
+          allergies: cd?.allergies || '',
+          medications: cd?.medications || '',
+          diseases: cd?.diseases || '',
+          surgeries: cd?.surgeries || '',
+          public_password: user.public_password || '',
+        }
+      } catch (e) {
+        this.error = e.message
+        localStorage.removeItem('auth_token')
+        localStorage.removeItem('auth_user')
+        this.$router.push('/login')
+      }
+    },
     async submit() {
       this.error = ''
       this.loading = true
       try {
-        const payload = { ...this.form }
-        const { user, token } = await api.post('/api/register', payload)
-        localStorage.setItem('auth_token', token)
-        localStorage.setItem('auth_user', JSON.stringify(user))
-        localStorage.setItem('auth_public_login', '')
-        this.$router.push('/')
+        if (this.isEdit) {
+          const user = await api.put('/api/user', this.form)
+          localStorage.setItem('auth_user', JSON.stringify(user))
+          this.$router.push('/')
+        } else {
+          const payload = { ...this.form }
+          const { user, token } = await api.post('/api/register', payload)
+          localStorage.setItem('auth_token', token)
+          localStorage.setItem('auth_user', JSON.stringify(user))
+          localStorage.setItem('auth_public_login', '')
+          this.$router.push('/')
+        }
       } catch (e) {
         const data = e.data || (() => {
           try { return JSON.parse(e.message) } catch { return null }
         })()
         const errs = data?.errors
+        const msg = this.isEdit ? 'Erro ao atualizar.' : 'Erro ao cadastrar.'
         if (errs) {
           const first = Object.values(errs).flat()[0]
-          this.error = first || data?.message || 'Erro ao cadastrar.'
+          this.error = first || data?.message || msg
         } else {
-          this.error = data?.message || e.message || 'Erro ao cadastrar.'
+          this.error = data?.message || e.message || msg
         }
       } finally {
         this.loading = false
