@@ -118,14 +118,34 @@
 
       <div class="d-flex flex-column gap-2">
         <button type="submit" class="btn btn-primary py-2" :disabled="loading">{{ submitButtonText }}</button>
+        <button
+          v-if="isEdit"
+          type="button"
+          class="btn btn-danger py-2"
+          :disabled="loading || deleting"
+          @click="confirmDelete"
+        >
+          {{ deleting ? 'Excluindo...' : 'Deletar conta' }}
+        </button>
         <router-link :to="isEdit ? '/' : '/login'" class="btn btn-secondary py-2">Voltar</router-link>
       </div>
+
+      <ConfirmModal
+        v-model="showDeleteModal"
+        title="Excluir conta"
+        message="Tem certeza que deseja excluir sua conta? Esta ação não pode ser desfeita."
+        confirm-text="Excluir"
+        cancel-text="Cancelar"
+        :loading="deleting"
+        @confirm="deleteAccount"
+      />
     </form>
   </div>
 </template>
 
 <script>
 import AppNavbar from '../components/AppNavbar.vue'
+import ConfirmModal from '../components/ConfirmModal.vue'
 import api from '../api/client.js'
 
 const emptyForm = () => ({
@@ -148,7 +168,7 @@ const emptyForm = () => ({
 })
 
 export default {
-  components: { AppNavbar },
+  components: { AppNavbar, ConfirmModal },
   data() {
     return {
       form: null,
@@ -157,8 +177,10 @@ export default {
       showPassword: false,
       showPasswordConfirm: false,
       showPublicPassword: false,
+      showDeleteModal: false,
       error: '',
       loading: false,
+      deleting: false,
     }
   },
   computed: {
@@ -252,6 +274,28 @@ export default {
         }
       } finally {
         this.loading = false
+      }
+    },
+    confirmDelete() {
+      this.showDeleteModal = true
+    },
+    async deleteAccount() {
+      this.deleting = true
+      this.error = ''
+      try {
+        await api.delete('/api/user')
+        localStorage.removeItem('auth_token')
+        localStorage.removeItem('auth_user')
+        localStorage.removeItem('auth_public_login')
+        this.showDeleteModal = false
+        this.$router.push('/login')
+      } catch (e) {
+        const data = e.data || (() => {
+          try { return JSON.parse(e.message) } catch { return null }
+        })()
+        this.error = data?.message || e.message || 'Erro ao excluir conta.'
+      } finally {
+        this.deleting = false
       }
     },
   },
