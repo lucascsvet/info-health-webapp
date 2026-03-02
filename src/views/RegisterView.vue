@@ -1,12 +1,5 @@
 <template>
-  <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: #6f42c1;">
-    <div class="container">
-      <router-link to="/" class="navbar-brand d-flex align-items-center text-decoration-none text-white">
-        <img src="/img/info-health.png" alt="Info Health" height="32" width="32" class="me-2">
-        <span>Info Health</span>
-      </router-link>
-    </div>
-  </nav>
+  <AppNavbar />
 
   <div class="container py-5">
     <div class="text-center mb-4">
@@ -130,9 +123,11 @@
 </template>
 
 <script>
+import AppNavbar from '../components/AppNavbar.vue'
 import api from '../api/client.js'
 
 export default {
+  components: { AppNavbar },
   data() {
     return {
       form: {
