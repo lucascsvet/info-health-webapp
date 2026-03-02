@@ -8,6 +8,7 @@
       <div v-if="auth && !isPublicLogin" class="navbar-nav ms-3 d-flex gap-2">
         <router-link to="/qr-code" class="nav-link text-white">Gerar QR Code</router-link>
         <router-link to="/editar-dados" class="nav-link text-white">Editar Dados</router-link>
+        <router-link to="/trocar-senha" class="nav-link text-white">Trocar Senha</router-link>
       </div>
       <div v-if="auth" class="navbar-nav ms-auto">
         <button type="button" class="btn btn-outline-light btn-sm" @click="logout" title="Sair"><i class="bi bi-box-arrow-right"></i></button>
