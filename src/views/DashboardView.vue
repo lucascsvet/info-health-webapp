@@ -29,7 +29,7 @@
               <span class="text-muted">Telefone</span>
               <span class="fw-medium">{{ user.phone || '—' }}</span>
             </div>
-            <div class="d-flex justify-content-between py-2">
+            <div v-if="user.public_password != null" class="d-flex justify-content-between py-2">
               <span class="text-muted">Senha Pública</span>
               <span class="fw-medium">{{ user.public_password || '—' }}</span>
             </div>
