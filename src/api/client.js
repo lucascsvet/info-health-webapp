@@ -44,6 +44,9 @@ export const api = {
   put(path, body, options = {}) {
     return request(path, { method: 'PUT', ...jsonBody(body), ...options })
   },
+  delete(path, options = {}) {
+    return request(path, { method: 'DELETE', ...options })
+  },
 }
 
 export default api
