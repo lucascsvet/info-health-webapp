@@ -96,6 +96,7 @@ export default {
     async fetchUser() {
       try {
         this.user = await api.get('/api/user')
+        localStorage.setItem('auth_public_login', this.user.is_public_login ? 'true' : '')
       } catch (e) {
         this.error = e.message
         localStorage.removeItem('auth_token')

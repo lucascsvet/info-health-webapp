@@ -186,6 +186,7 @@ export default {
         const { user, token } = await api.post('/api/register', payload)
         localStorage.setItem('auth_token', token)
         localStorage.setItem('auth_user', JSON.stringify(user))
+        localStorage.setItem('auth_public_login', '')
         this.$router.push('/')
       } catch (e) {
         const data = e.data || (() => {
