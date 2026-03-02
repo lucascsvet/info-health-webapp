@@ -92,12 +92,13 @@ export default {
       this.error = ''
       this.loading = true
       try {
-        const { user, token } = await api.post('/api/login-publico', {
+        const res = await api.post('/api/login-publico', {
           user_id: this.userId,
           public_password: this.publicPassword,
         })
-        localStorage.setItem('auth_token', token)
-        localStorage.setItem('auth_user', JSON.stringify(user))
+        localStorage.setItem('auth_token', res.token)
+        localStorage.setItem('auth_user', JSON.stringify(res.user))
+        localStorage.setItem('auth_public_login', res.is_public_login ? 'true' : '')
         this.$router.push('/')
       } catch (e) {
         const data = e.data || (() => {

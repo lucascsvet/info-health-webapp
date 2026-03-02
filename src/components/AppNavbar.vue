@@ -5,7 +5,7 @@
         <img src="/img/info-health.png" alt="Info Health" height="32" width="32" class="me-2">
         <span>Info Health</span>
       </router-link>
-      <div v-if="auth" class="navbar-nav ms-3">
+      <div v-if="auth && !isPublicLogin" class="navbar-nav ms-3">
         <router-link to="/qr-code" class="nav-link text-white">Gerar QR Code</router-link>
       </div>
       <div v-if="auth" class="navbar-nav ms-auto">
@@ -25,6 +25,11 @@ export default {
       default: false,
     },
   },
+  computed: {
+    isPublicLogin() {
+      return localStorage.getItem('auth_public_login') === 'true'
+    },
+  },
   methods: {
     async logout() {
       try {
@@ -32,6 +37,7 @@ export default {
       } catch (_) {}
       localStorage.removeItem('auth_token')
       localStorage.removeItem('auth_user')
+      localStorage.removeItem('auth_public_login')
       this.$router.push('/login')
     },
   },
