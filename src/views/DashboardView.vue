@@ -59,6 +59,10 @@
               <span class="fw-medium">{{ user.clinical_data?.diseases || 'Não informado' }}</span>
             </div>
             <div class="d-flex justify-content-between py-2 border-bottom">
+              <span class="text-muted">Cirurgias</span>
+              <span class="fw-medium">{{ user.clinical_data?.surgeries || 'Não informado' }}</span>
+            </div>
+            <div class="d-flex justify-content-between py-2 border-bottom">
               <span class="text-muted">Nome do Contato de Emergência</span>
               <span class="fw-medium">{{ user.clinical_data?.emergency_contact_name || 'Não informado' }}</span>
             </div>
