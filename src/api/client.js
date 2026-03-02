@@ -7,10 +7,9 @@ function getAuthHeaders() {
 
 async function request(path, options = {}) {
   const url = path.startsWith('http') ? path : `${baseURL.replace(/\/$/, '')}${path.startsWith('/') ? '' : '/'}${path}`
-  const res = await fetch(url, {
-    headers: { Accept: 'application/json', ...getAuthHeaders(), ...options.headers },
-    ...options,
-  })
+  const { headers: optHeaders, ...restOptions } = options
+  const headers = { Accept: 'application/json', ...getAuthHeaders(), ...optHeaders }
+  const res = await fetch(url, { headers, ...restOptions })
   if (!res.ok) {
     const text = await res.text().catch(() => res.statusText)
     try {
@@ -28,16 +27,22 @@ async function request(path, options = {}) {
   return res.text()
 }
 
+function jsonBody(body) {
+  return {
+    headers: { 'Content-Type': 'application/json' },
+    body: body ? JSON.stringify(body) : undefined,
+  }
+}
+
 export const api = {
-  get(path) {
-    return request(path, { method: 'GET' })
+  get(path, options = {}) {
+    return request(path, { method: 'GET', ...options })
   },
-  post(path, body) {
-    return request(path, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: body ? JSON.stringify(body) : undefined,
-    })
+  post(path, body, options = {}) {
+    return request(path, { method: 'POST', ...jsonBody(body), ...options })
+  },
+  put(path, body, options = {}) {
+    return request(path, { method: 'PUT', ...jsonBody(body), ...options })
   },
 }
 

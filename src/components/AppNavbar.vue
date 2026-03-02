@@ -5,8 +5,9 @@
         <img src="/img/info-health.png" alt="Info Health" height="32" width="32" class="me-2">
         <span>Info Health</span>
       </router-link>
-      <div v-if="auth && !isPublicLogin" class="navbar-nav ms-3">
+      <div v-if="auth && !isPublicLogin" class="navbar-nav ms-3 d-flex gap-2">
         <router-link to="/qr-code" class="nav-link text-white">Gerar QR Code</router-link>
+        <router-link to="/editar-dados" class="nav-link text-white">Editar Dados</router-link>
       </div>
       <div v-if="auth" class="navbar-nav ms-auto">
         <button type="button" class="btn btn-outline-light btn-sm" @click="logout" title="Sair"><i class="bi bi-box-arrow-right"></i></button>
