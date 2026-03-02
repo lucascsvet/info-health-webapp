@@ -1,7 +1,7 @@
 <template>
   <AppNavbar />
 
-  <div class="container-fluid d-flex align-items-center justify-content-center min-vh-100 bg-light">
+  <div v-if="userExists" class="container-fluid d-flex align-items-center justify-content-center min-vh-100 bg-light">
     <div class="card shadow-sm border-0" style="max-width: 420px; width: 100%;">
       <div class="card-body p-5">
         <div class="text-center mb-4">
@@ -10,41 +10,39 @@
           <p class="text-muted small mb-4">Faça seu login para detalhes de sua conta.</p>
         </div>
 
-        <div v-if="invalidUserId" class="alert alert-warning py-2 mb-3 small">
-          Link inválido. Verifique o endereço e tente novamente.
+        <div v-if="qrCodeDataUrl" class="text-center mb-4">
+          <img :src="qrCodeDataUrl" alt="QR Code" class="img-fluid d-block mx-auto" style="max-width: 240px;">
         </div>
-        <template v-else>
-          <div v-if="error" class="alert alert-danger py-2 mb-3 small">{{ error }}</div>
+        <div v-if="error" class="alert alert-danger py-2 mb-3 small">{{ error }}</div>
 
-          <form @submit.prevent="submit">
-            <div class="mb-4">
-              <label for="public_password" class="form-label">Senha</label>
-              <div class="input-group">
-                <input
-                  v-model="publicPassword"
-                  :type="showPassword ? 'text' : 'password'"
-                  class="form-control"
-                  id="public_password"
-                  placeholder="Digite sua senha"
-                  required
-                  autocomplete="off"
-                >
-                <button
-                  type="button"
-                  class="btn btn-outline-secondary"
-                  @click="showPassword = !showPassword"
-                  :aria-label="showPassword ? 'Ocultar senha' : 'Mostrar senha'"
-                >
-                  <i :class="showPassword ? 'bi bi-eye-slash' : 'bi bi-eye'"></i>
-                </button>
-              </div>
+        <form @submit.prevent="submit">
+          <div class="mb-4">
+            <label for="public_password" class="form-label">Senha</label>
+            <div class="input-group">
+              <input
+                v-model="publicPassword"
+                :type="showPassword ? 'text' : 'password'"
+                class="form-control"
+                id="public_password"
+                placeholder="Digite sua senha"
+                required
+                autocomplete="off"
+              >
+              <button
+                type="button"
+                class="btn btn-outline-secondary"
+                @click="showPassword = !showPassword"
+                :aria-label="showPassword ? 'Ocultar senha' : 'Mostrar senha'"
+              >
+                <i :class="showPassword ? 'bi bi-eye-slash' : 'bi bi-eye'"></i>
+              </button>
             </div>
+          </div>
 
-            <button type="submit" class="btn btn-primary w-100 py-2" :disabled="loading">
-              {{ submitButtonText }}
-            </button>
-          </form>
-        </template>
+          <button type="submit" class="btn btn-primary w-100 py-2" :disabled="loading">
+            {{ submitButtonText }}
+          </button>
+        </form>
 
         <p class="text-center text-muted small mt-4 mb-0">
           Não tem uma conta?
@@ -58,6 +56,7 @@
 <script>
 import AppNavbar from '../components/AppNavbar.vue'
 import api from '../api/client.js'
+import QRCode from 'qrcode'
 
 export default {
   components: { AppNavbar },
@@ -73,6 +72,8 @@ export default {
       showPassword: false,
       error: '',
       loading: false,
+      qrCodeDataUrl: '',
+      userExists: false,
     }
   },
   computed: {
@@ -80,14 +81,30 @@ export default {
       const id = parseInt(this.id, 10)
       return isNaN(id) || id <= 0 ? null : id
     },
-    invalidUserId() {
-      return this.userId === null
-    },
     submitButtonText() {
       return this.loading ? 'Entrando...' : 'Entrar'
     },
   },
+  async mounted() {
+    if (!this.userId) {
+      this.$router.replace('/')
+      return
+    }
+    try {
+      await api.get(`/api/users/${this.userId}/exists`)
+      this.userExists = true
+      await this.$nextTick()
+      await this.generateQrCode()
+    } catch {
+      this.$router.replace('/')
+    }
+  },
   methods: {
+    async generateQrCode() {
+      if (!this.userId) return
+      const url = `${window.location.origin}/acesso/${this.userId}`
+      this.qrCodeDataUrl = await QRCode.toDataURL(url, { width: 240, margin: 2 })
+    },
     async submit() {
       this.error = ''
       this.loading = true
