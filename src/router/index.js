@@ -5,6 +5,7 @@ const routes = [
   { path: '/acesso/:id', name: 'public-login', component: () => import('../views/PublicLoginView.vue'), props: true },
   { path: '/registro', name: 'register', component: () => import('../views/RegisterView.vue'), meta: { guest: true } },
   { path: '/', name: 'dashboard', component: () => import('../views/DashboardView.vue'), meta: { requiresAuth: true } },
+  { path: '/qr-code', name: 'qr-code', component: () => import('../views/QrCodeView.vue'), meta: { requiresAuth: true } },
   { path: '/:pathMatch(.*)*', redirect: '/' },
 ]
 
