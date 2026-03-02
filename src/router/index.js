@@ -7,6 +7,7 @@ const routes = [
   { path: '/', name: 'dashboard', component: () => import('../views/DashboardView.vue'), meta: { requiresAuth: true } },
   { path: '/qr-code', name: 'qr-code', component: () => import('../views/QrCodeView.vue'), meta: { requiresAuth: true, requiresNormalAuth: true } },
   { path: '/editar-dados', name: 'editar-dados', component: () => import('../views/RegisterView.vue'), meta: { requiresAuth: true, requiresNormalAuth: true } },
+  { path: '/trocar-senha', name: 'trocar-senha', component: () => import('../views/ChangePasswordView.vue'), meta: { requiresAuth: true, requiresNormalAuth: true } },
   { path: '/:pathMatch(.*)*', redirect: '/' },
 ]
 
