@@ -2,10 +2,25 @@
 
 Frontend Vue 3 + Vite do projeto Info Health, integrado à API **info-health-api**.
 
+## Tecnologias
+
+| Tecnologia | Versão | Uso |
+|------------|--------|-----|
+| Vue.js | 3.5 | Framework reativo |
+| Vite | 7.3 | Build tool e dev server |
+| Vue Router | 5.0 | Roteamento SPA |
+| Bootstrap | 5.3 | UI e componentes |
+| Bootstrap Icons | 1.13 | Ícones |
+| QRCode.js | 1.5 | Geração de QR Code |
+| vue-3-mask | 0.0.1-alpha | Máscaras de input (CPF, telefone) |
+
 ## Desenvolvimento local
+
+**Pré-requisitos:** Node.js 18+, npm.
 
 ```bash
 npm install
+cp .env.example .env
 npm run dev
 ```
 
