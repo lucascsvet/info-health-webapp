@@ -1,77 +1,129 @@
-# Info Health – Frontend
+# Info Health
 
-Frontend Vue 3 + Vite do projeto Info Health, integrado à API **info-health-api**.
+Sistema de informações de saúde para trabalhadores, permitindo cadastro de dados clínicos, acesso via login e compartilhamento seguro em situações de emergência através de QR Code.
 
 ## Tecnologias
 
-| Tecnologia | Versão | Uso |
-|------------|--------|-----|
-| Vue.js | 3.5 | Framework reativo |
-| Vite | 7.3 | Build tool e dev server |
-| Vue Router | 5.0 | Roteamento SPA |
-| Bootstrap | 5.3 | UI e componentes |
-| Bootstrap Icons | 1.13 | Ícones |
-| QRCode.js | 1.5 | Geração de QR Code |
-| vue-3-mask | 0.0.1-alpha | Máscaras de input (CPF, telefone) |
+| Componente | Stack |
+|------------|-------|
+| **Frontend** | Vue 3, Vite 7, Vue Router 5, Bootstrap 5, Bootstrap Icons, QRCode.js, vue-3-mask |
+| **Backend** | PHP 8.2, Laravel 12, Laravel Sanctum |
+| **Banco de dados** | PostgreSQL 16 |
+| **Deploy** | Docker, Render.com |
 
-## Desenvolvimento local
+## Estrutura do projeto
 
-**Pré-requisitos:** Node.js 18+, npm.
+```
+├── info-health-api/      # API REST (Laravel)
+├── info-health-webapp/   # Frontend SPA (Vue 3 + Vite)
+```
+
+## Pré-requisitos
+
+- **Node.js** 18+ e npm (para o frontend)
+- **PHP** 8.2+ e **Composer** (para a API)
+- **PostgreSQL** 16 (ou Docker para rodar tudo)
+
+## Como rodar
+
+### Opção 1: Desenvolvimento local (API + Frontend separados)
+
+#### 1. API (Laravel)
 
 ```bash
+cd info-health-api
+composer install
+cp .env.example .env
+php artisan key:generate
+```
+
+Configure o banco no `.env` (PostgreSQL):
+
+```
+DB_CONNECTION=pgsql
+DB_HOST=127.0.0.1
+DB_PORT=5432
+DB_DATABASE=info_health_api
+DB_USERNAME=postgres
+DB_PASSWORD=postgres
+```
+
+Depois rode as migrações e inicie o servidor:
+
+```bash
+php artisan migrate
+php artisan serve
+```
+
+API em `http://localhost:8000` (ou porta padrão do Laravel).
+
+#### 2. Frontend (Vue)
+
+```bash
+cd info-health-webapp
 npm install
 cp .env.example .env
+```
+
+Configure `.env`:
+
+```
+VITE_API_URL=http://localhost:8000
+```
+
+Inicie o frontend:
+
+```bash
 npm run dev
 ```
 
-Acesse `http://localhost:5173`. A URL da API é definida em `.env`:
+Frontend em `http://localhost:5173`.
 
-- Crie `.env` a partir de `.env.example`.
-- `VITE_API_URL=http://localhost:8000` (API rodando na máquina ou em Docker).
+---
 
-Com a API em `http://localhost:8000`, a página exibe o status da conexão.
+### Opção 2: Docker (frontend + API)
 
-## Docker (build individual do frontend)
-
-Build e execução **somente do frontend**:
+1. **Build do frontend** (uma vez, ou quando alterar o webapp):
 
 ```bash
+cd info-health-webapp
 docker compose build
+```
+
+2. **Subir a stack completa**:
+
+```bash
+cd info-health-api
 docker compose up
 ```
 
-A imagem é gravada como `info-health-webapp:latest`. Frontend em `http://localhost:3000` (API em `http://localhost:8000`).
-
-1. **Construir o frontend** (uma vez, ou quando mudar o webapp):
-
-   ```bash
-   cd info-health-webapp
-   docker compose build
-   ```
-
-2. **Subir a stack** (API + frontend):
-
-   ```bash
-   cd info-health-api
-   docker compose up
-   ```
-
 - API: `http://localhost:8000`
-- Frontend: `http://localhost:3000`
+- Frontend: `http://localhost:3000` (se usar o proxy do frontend para a API)
+
+---
+
+## Variáveis de ambiente
+
+### API (`.env`)
+
+| Variável | Descrição |
+|----------|-----------|
+| `APP_KEY` | Chave da aplicação (gerar com `php artisan key:generate --show`) |
+| `APP_URL` | URL da API (ex: `https://info-health-api.onrender.com`) |
+| `FRONTEND_URL` | URL do frontend para CORS (ex: `https://info-health-webapp.onrender.com`) |
+| `DB_*` | Configurações do PostgreSQL |
+
+### Frontend (`.env`)
+
+| Variável | Descrição |
+|----------|-----------|
+| `VITE_API_URL` | URL da API (ex: `http://localhost:8000` ou URL do Render) |
 
 ## Deploy no Render.com
 
-1. Crie um **Static Site** e conecte o repositório do **info-health-webapp**.
-2. **Build Command:** `npm install && npm run build`
-3. **Publish Directory:** `dist`
-4. **Variável de ambiente (obrigatória):** `VITE_API_URL` = URL pública da API no Render (ex: `https://info-health-api.onrender.com`).  
-   Deploy a API primeiro, copie a URL e use aqui (o valor é injetado em tempo de build).
-5. Após o deploy, informe na API a URL do frontend (variável `FRONTEND_URL`) para CORS.
+1. **API**: crie um Web Service com Docker, conecte o repositório e configure as variáveis (`APP_KEY`, `APP_URL`, `FRONTEND_URL`, `DATABASE_URL` se usar PostgreSQL gerenciado).
+2. **Frontend**: crie um Static Site, conecte o repositório e defina `VITE_API_URL` com a URL da API no Render.
+3. Deploy a API primeiro; depois copie a URL e use em `VITE_API_URL` do frontend.
+4. Configure `FRONTEND_URL` na API com a URL do frontend para CORS.
 
-Veja também `render.yaml` neste repositório.
-
-## Integração com a API
-
-- Cliente de API em `src/api/client.js` (usa `VITE_API_URL`).
-- Em desenvolvimento, o Vite pode fazer proxy de `/api` para a API (ver `vite.config.js`).
-- A API **info-health-api** está com CORS configurado em `config/cors.php` para aceitar requisições do frontend.
+Veja `render.yaml` em cada pasta para mais detalhes.
